@@ -26,17 +26,17 @@ def main():
     conf =""
     with open('conf.json') as f:
         conf = json.load(f)
-    summonerID = getSummoner(conf["summonerName"])
+    summonerID = getSummoner(conf)
     print(summonerID)
-    es_client = Elasticsearch(
-                    host="localhost",
-                    port=9200,
-                )
-    create_index(es_client,conf["elasticsearch"]["index"])
-    es_client.index(index=conf["elasticsearch"]["index"],
-                    doc_type=conf["elasticsearch"]["type"],
-                    body=summonerID,
-                    id=summonerID["id"])
+    # es_client = Elasticsearch(
+    #                 host="localhost",
+    #                 port=9200,
+    #             )
+    # create_index(es_client,conf["elasticsearch"]["index"])
+    # es_client.index(index=conf["elasticsearch"]["index"],
+    #                 doc_type=conf["elasticsearch"]["type"],
+    #                 body=summonerID,
+    #                 id=summonerID["id"])
 
 def create_index(es_client, index):
     """
@@ -52,12 +52,14 @@ def create_index(es_client, index):
 
 
 
-def getMatchs(summonerID):
-    reconstructUrl =conf["lol"]["baseURL"]+conf["lol"]["matchListURL"]+str(summonerID)+"?api_key="+conf["lol"]["apiKey"]
+def getMatchs(conf):
+    reconstructUrl ="https://"+conf["lol"]["server"]+conf["lol"]["baseURL"]+conf["lol"]["matchListURL"]+str(summonerID)+"?api_key="+conf["lol"]["apiKey"]
 
-def getSummoner(summoner,conf):
-    summoner.replace(" ", "%20")
-    reconstructUrl =conf["lol"]["baseURL"]+conf["lol"]["summonerURL"]+conf["lol"]["summonerName"]+conf["lol"]["apiKey"]
+def getSummoner(conf):
+    summoner=conf["lol"]["summonerName"].replace(" ", "%20")
+    print("pouet")
+    reconstructUrl ="https://"+conf["lol"]["server"]+conf["lol"]["baseURL"]+conf["lol"]["summonerURL"]+summoner+"?api_key="+conf["lol"]["apiKey"]
+    # reconstructUrl = "toto"
     print(reconstructUrl)
     req = requests.get(reconstructUrl)
     # print(req.content)
