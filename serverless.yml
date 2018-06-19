@@ -1,0 +1,89 @@
+# Happy Coding!
+
+service: GuildWars
+
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  accountId: 232941585376
+  region: eu-west-1
+  role: LambdaGWStuffRole
+  timeout: 300
+  memorySize: 128
+
+resources:
+  Resources:
+    GetGWMatchs:
+      Properties:
+        RetentionInDays: "7"
+    LambdaGWStuffRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:service}-${self:provider.stage}-LambdaLoLRole
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: basic_lambda
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                  Resource: arn:aws:logs:${self:provider.region}:${self:provider.accountId}:log-group:/aws/lambda/*:*:*
+
+functions:
+  UpdateInvoiceData:
+    handler: update_maps.main
+    description: get matchs from gw API
+    events:
+      - s3:
+          bucket: lolstuffbucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: trigger
+            - suffix: .txt
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: false
+    noDeploy:
+      - boto3
+      - botocore
+      - docutils
+      - jmespath
+      - python-dateutil
+      - six
+      - s3transfer
+      - botocore
+      - mock
+      - pbr
+      - pipdeptree
+      - pip
+      - pylint
+      - astroid
+      - lazy-object-proxy
+      - wrapt
+      - isort
+      - mccabe
+      - pytest-cov
+      - coverage
+      - pytest
+      - attrs
+      - pluggy
+      - py
+      - setuptools
+      - wheel
