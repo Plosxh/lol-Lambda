@@ -1,24 +1,24 @@
 # Happy Coding!
 
-service: GuildWars
+service: LoL
 
 
 provider:
   name: aws
   runtime: python3.6
   stage: dev
-  accountId: 232941585376
   region: eu-west-1
-  role: LambdaGWStuffRole
+  role: LambdaLoLStuffRole
   timeout: 300
   memorySize: 128
 
 resources:
   Resources:
-    GetGWMatchs:
+    GetLoLInfos:
+      Type: AWS::Logs::LogGroup
       Properties:
         RetentionInDays: "7"
-    LambdaGWStuffRole:
+    LambdaLoLStuffRole:
       Type: AWS::IAM::Role
       Properties:
         RoleName: ${self:service}-${self:provider.stage}-LambdaLoLRole
@@ -43,9 +43,9 @@ resources:
                   Resource: arn:aws:logs:${self:provider.region}:${self:provider.accountId}:log-group:/aws/lambda/*:*:*
 
 functions:
-  UpdateInvoiceData:
-    handler: update_maps.main
-    description: get matchs from gw API
+  lolstuff:
+    handler: lolstuff.main
+    description: get datas from LoL API en send it to ES and Slack
     events:
       - s3:
           bucket: lolstuffbucket
@@ -54,36 +54,36 @@ functions:
             - prefix: trigger
             - suffix: .txt
 
-plugins:
-  - serverless-python-requirements
-
-custom:
-  pythonRequirements:
-    dockerizePip: false
-    noDeploy:
-      - boto3
-      - botocore
-      - docutils
-      - jmespath
-      - python-dateutil
-      - six
-      - s3transfer
-      - botocore
-      - mock
-      - pbr
-      - pipdeptree
-      - pip
-      - pylint
-      - astroid
-      - lazy-object-proxy
-      - wrapt
-      - isort
-      - mccabe
-      - pytest-cov
-      - coverage
-      - pytest
-      - attrs
-      - pluggy
-      - py
-      - setuptools
-      - wheel
+# plugins:
+#   - serverless-python-requirements
+#
+# custom:
+#   pythonRequirements:
+#     dockerizePip: false
+#     noDeploy:
+#       - boto3
+#       - botocore
+#       - docutils
+#       - jmespath
+#       - python-dateutil
+#       - six
+#       - s3transfer
+#       - botocore
+#       - mock
+#       - pbr
+#       - pipdeptree
+#       - pip
+#       - pylint
+#       - astroid
+#       - lazy-object-proxy
+#       - wrapt
+#       - isort
+#       - mccabe
+#       - pytest-cov
+#       - coverage
+#       - pytest
+#       - attrs
+#       - pluggy
+#       - py
+#       - setuptools
+#       - wheel
